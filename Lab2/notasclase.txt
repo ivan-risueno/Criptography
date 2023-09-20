@@ -1,0 +1,23 @@
+Para sumar dos polinomios hacemos su XOR
+
+Para multiplicarlos, los multiplicamos normal y dividimos entre m, y nos quedamos con el resto.
+
+---xTime---
+
+si A < 128: A << 1
+else: (A << 1) XOR m
+
+Producto lento (A, B): sumatorio desde i=0 hasta 7 de b sub i por x elevado a i por A(x)
+
+---Tablas EXP. Log---
+Cuando trabajamos con valores de hasta 255, y comenzamos a elevar g a infinitos exponentes,
+llegará un momento en el que g^r == g^s, o sea, que un g^k == 1, y g^(k + 1) == g. 
+
+A partir del generador mas pequeño podemos construir las tablas de exponenciación, que constan 
+de, para cada i, los valores de g^i hasta que i vale 254.
+
+---Producto rápido---
+Ahora, si quisieramos multiplicar dos bytes(polinomios), haríamos A · B = g^i · g^j = g^( (i+j)%255 ).
+Entonces, también tenemos que A · B = EXP[(Log(A) + Log(B)) % 255].
+
+Para calcular el inverso, siempre que A != 0, A^-1 = (g^i)^-1 = g^-i · g^255 = g^(255 - i).
