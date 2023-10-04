@@ -17,74 +17,74 @@ class AES:
         Rcon: equivalente a la tabla 5, p´ag. 17
         InvMixMatrix : equivalente a la matriz usada en 5.3.3, p´ag. 24
         """
-        self.Polinomio_Irreducible
+        self.Polinomio_Irreducible = Polinomio_Irreducible
         self.SBox
         self.InvSBox
         self.Rcon
         self.InvMixMatrix
 
     def SubBytes(self, State):
-        """
+        """miguel
         5.1.1 SUBBYTES()
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def InvSubBytes(self, State):
-        """
+        """miguel
         5.3.2 INVSUBBYTES()
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def ShiftRows(self, State):
-        """
+        """ivan
         5.1.2 SHIFTROWS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def InvShiftRows(self, State):
-        """
+        """ivan
         5.3.1 INVSHIFTROWS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def MixColumns(self, State):
-        """
+        """miguel
         5.1.3 MIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def InvMixColumns(self, State):
-        """
+        """miguel
         5.3.3 INVMIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def AddRoundKey(self, State, roundKey):
-        """
+        """ivan
         5.1.4 ADDROUNDKEY()
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def KeyExpansion(self, key):
-        """
+        """ivan
         5.2 KEYEXPANSION()
         FIPS 197: Advanced Encryption Standard (AES)
         """
     def Cipher(self, State, Nr, Expanded_KEY):
-        """
+        """miguel
         5.1 Cipher(), Algorithm 1 p´ag. 12
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def InvCipher(self, State, Nr, Expanded_KEY):
-        """
+        """miguel
         5. InvCipher()
         Algorithm 3 p´ag. 20 o Algorithm 4 p´ag. 25. Son equivalentes
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
     def encrypt_file(self, fichero):
-        """
+        """ivan
         Entrada: Nombre del fichero a cifrar
         Salida: Fichero cifrado usando la clave utilizada en el constructor
         de la clase.
@@ -96,7 +96,7 @@ class AES:
         """
 
     def decrypt_file(self, fichero):
-        """
+        """ivan
         Entrada: Nombre del fichero a descifrar
         Salida: Fichero descifrado usando la clave utilizada en el constructor
         de la clase.
