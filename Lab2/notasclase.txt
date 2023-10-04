@@ -21,3 +21,18 @@ Ahora, si quisieramos multiplicar dos bytes(polinomios), haríamos A · B = g^i 
 Entonces, también tenemos que A · B = EXP[(Log(A) + Log(B)) % 255].
 
 Para calcular el inverso, siempre que A != 0, A^-1 = (g^i)^-1 = g^-i · g^255 = g^(255 - i).
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+CLAVE EXPANDIDA A PARTIR DE LA QUE NOS PASAN:
+Las claves pueden ser de 16B, 24B o 32B.
+Las expanded keys serán de 176B, 208B o 240B.
+Se generan haciendo 11, 13 o 15 rounds.
+
+Montamos una lista de cuatro filas y las filas que sean con la Key0. En cada posicion irá 1 byte.
+Para generar la columna 0 de la clave i hay que coger la última columna de la clave i-1 y subimos todos los
+bytes una posicion, y el de arriba lo ponemos abajo. A continuacion a cada uno de los bytes se le aplica el subbyte(sbox).
+A continuacion se hace un XOR con los bytes de la key del bloque anterior. Por ultimo se hace un XOR con la posicion de
+una matriz que se llama RCON(la que toque).     Keyi[j] = Keyi-1[j] XOR Keyi[j-1].
+La RCON es un bloque muy largo de la longitud que toque, que está constituida por vectores columna. En las filas 2,3 y 4
+son 0s. En la primera fila hay 1,2,4,8,16... con la aritmetica del cuerpo finito(usamos el xTimes).
