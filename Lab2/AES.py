@@ -41,11 +41,30 @@ class AES:
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
+        ret = State
+
+        for i in range(1, len(State)):
+            for n in range(0, i):
+                tmp = ret[i][0]
+                for j in range(len(State[i]) - 1):
+                    ret[i][j] = State[i][(j + 1) % 4]
+                ret[i][len(State[i]) - 1] = tmp
+        return ret
+
     def InvShiftRows(self, State):
         """ivan
         5.3.1 INVSHIFTROWS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        ret = State
+
+        for i in range(1, len(State)):
+            for n in range(0, i):
+                tmp = ret[i][len(State[i]) - 1]
+                for j in range(len(State[i]) - 1, 0, -1):
+                    ret[i][j] = State[i][(j - 1) % 4]
+                ret[i][0] = tmp
+        return ret
 
     def MixColumns(self, State):
         """miguel
