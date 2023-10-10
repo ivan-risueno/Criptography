@@ -66,12 +66,16 @@ class AES:
         5.1.1 SUBBYTES()
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        for i in range(len(State)):
+            State[i] = self.SBox[State[i]]
 
     def InvSubBytes(self, State):
         """miguel
         5.3.2 INVSUBBYTES()
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        for i in range(len(State)):
+            State[i] = self.InvSBox[State[i]]
 
     def ShiftRows(self, State):
         """ivan
