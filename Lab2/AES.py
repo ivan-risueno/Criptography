@@ -125,12 +125,18 @@ class AES:
         5.1.4 ADDROUNDKEY()
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        ret = State
+        for i in range(0, len(State)):
+            for j in range(0, len(State[i])):
+                ret[i][j] = State[i][j] ^ roundKey[i][j]
+        return ret
 
     def KeyExpansion(self, key):
         """ivan
         5.2 KEYEXPANSION()
         FIPS 197: Advanced Encryption Standard (AES)
         """
+
     def Cipher(self, State, Nr, Expanded_KEY):
         """miguel
         5.1 Cipher(), Algorithm 1 p´ag. 12
