@@ -1,3 +1,5 @@
+from Lab2.G_F import G_F
+
 class AES:
     """
     Documento de referencia:
@@ -6,6 +8,15 @@ class AES:
     El nombre de los m´etodos, tablas, etc son los mismos (salvo capitalizaci´on)
     que los empleados en el FIPS 197
     """
+
+    def initRcon(self):
+        rcon = [[0 for _ in range(4)] for _ in range(10)]
+        rcon[0][0] = 0x01
+        for i in range(1, 10):
+            rcon[i][0] = self.gf.xTimes(rcon[i - 1][0])
+
+        return rcon
+
     def __init__(self, key, Polinomio_Irreducible = 0x11B):
         """
         Entrada:
@@ -18,9 +29,10 @@ class AES:
         InvMixMatrix : equivalente a la matriz usada en 5.3.3, p´ag. 24
         """
         self.Polinomio_Irreducible = Polinomio_Irreducible
+        self.gf = G_F()
         self.SBox
         self.InvSBox
-        self.Rcon
+        self.Rcon = self.initRcon()
         self.InvMixMatrix
 
     SBox = (
@@ -137,6 +149,7 @@ class AES:
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
+
     def Cipher(self, State, Nr, Expanded_KEY):
         """miguel
         5.1 Cipher(), Algorithm 1 p´ag. 12
@@ -173,3 +186,4 @@ class AES:
         El nombre de fichero descifrado ser´a el obtenido al a~nadir el sufijo .dec
         al nombre del fichero a descifrar: NombreFichero --> NombreFichero.dec
         """
+a = AES(1)
