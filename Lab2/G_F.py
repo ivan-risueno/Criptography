@@ -69,10 +69,10 @@ class G_F:
         #Salida: un elemento del cuerpo representado por un entero entre 0 y 255
         #que es el producto en el cuerpo de ’n’ y 0x02 (el polinomio X).
 
-        if n < 128:
-            return n << 1
-
-        return (n << 1) ^ 256
+        if n & 0x80:
+            return ((n << 1) ^ 0x1B) & 0xFF
+        else:
+            return (n << 1) & 0xFF
 
     def producto(self, a, b):
 
