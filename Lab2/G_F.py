@@ -98,8 +98,8 @@ class G_F:
 
         return self.Tabla_EXP[255 - self.Tabla_LOG[n]]
 
-a = G_F()
+#a = G_F()
 
-print(a.productoLento(12,240))
-print(a.producto(12, 240))
-print(a.inverso(11))
+#print(a.productoLento(12,240))
+#print(a.producto(12, 240))
+#print(a.inverso(11))
