@@ -120,17 +120,48 @@ class AES:
                 ret[i][0] = tmp
         return ret
 
+    def GaloisMulti(x, y):
+        p = 0
+        for c in range(8):
+            if b & 1:
+                p ^= a
+            a <<= 1
+            if a & 0x100:
+                a ^= 0x11b
+            b >>= 1
+        return p
+
     def MixColumns(self, State):
         """miguel
         5.1.3 MIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        nState = []
+        for i in range(4):
+            col = self.state[c*4:(c+1)*4]
+            nState.extend((
+                        AES.GaloisMulti[0x02][col[0]] ^ AES.GaloisMulti[0x03][col[1]] ^ col[2] ^ col[3],
+                        col[0] ^ AES.GaloisMulti[0x02][col[1]] ^ AES.GaloisMulti[0x03][col[2]] ^ col[3],
+                        col[0] ^ col[1] ^ AES.GaloisMulti[0x02][col[2]] ^ AES.GaloisMulti[0x03][col[3]],
+                        AES.GaloisMulti[0x03][col[0]] ^ col[1] ^ col[2] ^ AES.GaloisMulti[0x02][col[3]],
+                    ))
+        self.State = nState
 
     def InvMixColumns(self, State):
         """miguel
         5.3.3 INVMIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        nState = []
+        for i in range(4):
+            col = self.state[c*4:(c+1)*4]
+            nState.extend((
+                        AES.GaloisMulti[0x0E][col[0]] ^ AES.GaloisMulti[0x0B][col[1]] ^ AES.GaloisMulti[0x0D][col[2]] ^ AES.GaloisMulti[0x09][col[3]],
+                        AES.GaloisMulti[0x09][col[0]] ^ AES.GaloisMulti[0x0E][col[1]] ^ AES.GaloisMulti[0x0B][col[2]] ^ AES.GaloisMulti[0x0D][col[3]],
+                        AES.GaloisMulti[0x0D][col[0]] ^ AES.GaloisMulti[0x09][col[1]] ^ AES.GaloisMulti[0x0E][col[2]] ^ AES.GaloisMulti[0x0B][col[3]],
+                        AES.GaloisMulti[0x0B][col[0]] ^ AES.GaloisMulti[0x0D][col[1]] ^ AES.GaloisMulti[0x09][col[2]] ^ AES.GaloisMulti[0x0E][col[3]],
+                    ))
+        self.State = nState
 
     def AddRoundKey(self, State, roundKey):
         """ivan
