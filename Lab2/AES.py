@@ -138,13 +138,13 @@ class AES:
         """
         nState = []
         for i in range(4):
-            col = self.state[c*4:(c+1)*4]
+            col = self.state[c * 4:(c + 1) * 4]
             nState.extend((
-                        AES.GaloisMulti[0x02][col[0]] ^ AES.GaloisMulti[0x03][col[1]] ^ col[2] ^ col[3],
-                        col[0] ^ AES.GaloisMulti[0x02][col[1]] ^ AES.GaloisMulti[0x03][col[2]] ^ col[3],
-                        col[0] ^ col[1] ^ AES.GaloisMulti[0x02][col[2]] ^ AES.GaloisMulti[0x03][col[3]],
-                        AES.GaloisMulti[0x03][col[0]] ^ col[1] ^ col[2] ^ AES.GaloisMulti[0x02][col[3]],
-                    ))
+                AES.GaloisMulti[0x02][col[0]] ^ AES.GaloisMulti[0x03][col[1]] ^ col[2] ^ col[3],
+                col[0] ^ AES.GaloisMulti[0x02][col[1]] ^ AES.GaloisMulti[0x03][col[2]] ^ col[3],
+                col[0] ^ col[1] ^ AES.GaloisMulti[0x02][col[2]] ^ AES.GaloisMulti[0x03][col[3]],
+                AES.GaloisMulti[0x03][col[0]] ^ col[1] ^ col[2] ^ AES.GaloisMulti[0x02][col[3]],
+            ))
         self.State = nState
 
     def InvMixColumns(self, State):
@@ -154,13 +154,17 @@ class AES:
         """
         nState = []
         for i in range(4):
-            col = self.state[c*4:(c+1)*4]
+            col = self.state[c * 4:(c + 1) * 4]
             nState.extend((
-                        AES.GaloisMulti[0x0E][col[0]] ^ AES.GaloisMulti[0x0B][col[1]] ^ AES.GaloisMulti[0x0D][col[2]] ^ AES.GaloisMulti[0x09][col[3]],
-                        AES.GaloisMulti[0x09][col[0]] ^ AES.GaloisMulti[0x0E][col[1]] ^ AES.GaloisMulti[0x0B][col[2]] ^ AES.GaloisMulti[0x0D][col[3]],
-                        AES.GaloisMulti[0x0D][col[0]] ^ AES.GaloisMulti[0x09][col[1]] ^ AES.GaloisMulti[0x0E][col[2]] ^ AES.GaloisMulti[0x0B][col[3]],
-                        AES.GaloisMulti[0x0B][col[0]] ^ AES.GaloisMulti[0x0D][col[1]] ^ AES.GaloisMulti[0x09][col[2]] ^ AES.GaloisMulti[0x0E][col[3]],
-                    ))
+                AES.GaloisMulti[0x0E][col[0]] ^ AES.GaloisMulti[0x0B][col[1]] ^ AES.GaloisMulti[0x0D][col[2]] ^
+                AES.GaloisMulti[0x09][col[3]],
+                AES.GaloisMulti[0x09][col[0]] ^ AES.GaloisMulti[0x0E][col[1]] ^ AES.GaloisMulti[0x0B][col[2]] ^
+                AES.GaloisMulti[0x0D][col[3]],
+                AES.GaloisMulti[0x0D][col[0]] ^ AES.GaloisMulti[0x09][col[1]] ^ AES.GaloisMulti[0x0E][col[2]] ^
+                AES.GaloisMulti[0x0B][col[3]],
+                AES.GaloisMulti[0x0B][col[0]] ^ AES.GaloisMulti[0x0D][col[1]] ^ AES.GaloisMulti[0x09][col[2]] ^
+                AES.GaloisMulti[0x0E][col[3]],
+            ))
         self.State = nState
 
     def AddRoundKey(self, State, roundKey):
@@ -171,7 +175,7 @@ class AES:
         ret = State
         for i in range(0, len(State)):
             for j in range(0, len(State[i])):
-                ret[i][j] = State[i][j] ^ roundKey[i][j]
+                ret[i][j] = State[i][j] ^ roundKey[j][i]
         return ret
 
     def rotWord(self, word):
@@ -205,7 +209,7 @@ class AES:
 
             if i % self.Nk == 0:
                 temp = self.subWord(self.rotWord(temp))
-                temp[0] ^= self.Rcon[int(i/self.Nk) - 1][0]  # Todos los bytes de RCON son 0 menos el primero
+                temp[0] ^= self.Rcon[int(i / self.Nk) - 1][0]  # Todos los bytes de RCON son 0 menos el primero
             elif self.Nk > 6 and i % self.Nk == 4:
                 temp = self.subWord(temp)
 
@@ -219,6 +223,17 @@ class AES:
         5.1 Cipher(), Algorithm 1 p´ag. 12
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        State = self.AddRoundKey(State, Expanded_KEY[0:4])
+        for round in range(1, Nr - 1):
+            State = self.SubBytes(State)
+            State = self.ShiftRows(State)
+            State = self.MixColumns(State)
+            State = self.AddRoundKey(State, Expanded_KEY[4 * round:4 * round + 4])
+
+        State = self.SubBytes(State)
+        State = self.ShiftRows(State)
+        State = self.AddRoundKey(State, Expanded_KEY[4 * Nr:4 * Nr + 4])
+        return State
 
     def InvCipher(self, State, Nr, Expanded_KEY):
         """ivan
@@ -226,6 +241,23 @@ class AES:
         Algorithm 3 p´ag. 20 o Algorithm 4 p´ag. 25. Son equivalentes
         FIPS 197: Advanced Encryption Standard (AES)
         """
+        State = self.AddRoundKey(State, Expanded_KEY[4*Nr:4*Nr+4])
+        for round in range(Nr - 1, 1, -1):
+            State = self.InvShiftRows(State)
+            State = self.InvSubBytes(State)
+            State = self.AddRoundKey(State, Expanded_KEY[4*round:4*round+4])
+            State = self.InvMixColumns(State)
+
+        State = self.InvShiftRows(State)
+        State = self.InvSubBytes(State)
+        State = self.AddRoundKey(State, Expanded_KEY[0:4])
+        return State
+
+    def printState(self, State, functionCalled):
+        print(functionCalled)
+        for i in range(len(State)):
+            print(hex(State[i][0]) + " " + hex(State[i][1]) + " " + hex(State[i][2]) + " " + hex(State[i][3]))
+        print()
 
     def encrypt_file(self, fichero):
         """miguel
@@ -250,3 +282,28 @@ class AES:
         El nombre de fichero descifrado ser´a el obtenido al a~nadir el sufijo .dec
         al nombre del fichero a descifrar: NombreFichero --> NombreFichero.dec
         """
+
+
+k = [0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c]
+a = AES(k)
+key = a.KeyExpansion(k)
+input = [[0x32, 0x88, 0x31, 0xe0],
+         [0x43, 0x5a, 0x31, 0x37],
+         [0xf6, 0x30, 0x98, 0x07],
+         [0xa8, 0x8d, 0xa2, 0x34]]
+ret = a.AddRoundKey(input, key[0:4])
+a.printState(ret, "AddRoundKey")
+ret = [[0xd4, 0xe0, 0xb8, 0x1e],
+       [0x27, 0xbf, 0xb4, 0x41],
+       [0x11, 0x98, 0x5d, 0x52],
+       [0xae, 0xf1, 0xe5, 0x30]]
+a.printState(ret, "SubBytes")
+ret = a.ShiftRows(ret)
+a.printState(ret, "ShiftRows")
+ret = [[0x4, 0xe0, 0x48, 0x28],
+       [0x66, 0xcb, 0xf8, 0x6],
+       [0x81, 0x19, 0xd3, 0x26],
+       [0xe5, 0x9a, 0x7a, 0x4c]]
+a.printState(ret, "MixColumn")
+ret = a.AddRoundKey(ret, key[4 * 1:4 * 1 + 4])
+a.printState(ret, "AddRoundKey")
