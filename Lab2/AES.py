@@ -77,7 +77,7 @@ class AES:
         self.InvMixMatrix = [0x0e, 0x09, 0x0d, 0x0b]
 
     def SubBytes(self, State):
-        """miguel
+        """
         5.1.1 SUBBYTES()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -87,7 +87,7 @@ class AES:
         return State
 
     def InvSubBytes(self, State):
-        """miguel
+        """
         5.3.2 INVSUBBYTES()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -97,7 +97,7 @@ class AES:
         return State
 
     def ShiftRows(self, State):
-        """ivan
+        """
         5.1.2 SHIFTROWS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -113,7 +113,7 @@ class AES:
         return ret
 
     def InvShiftRows(self, State):
-        """ivan
+        """
         5.3.1 INVSHIFTROWS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -128,7 +128,7 @@ class AES:
         return ret
 
     def MixColumns(self, State):
-        """miguel
+        """
         5.1.3 MIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -149,7 +149,7 @@ class AES:
         return State
 
     def InvMixColumns(self, State):
-        """miguel
+        """
         5.3.3 INVMIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -178,7 +178,7 @@ class AES:
         return State
 
     def AddRoundKey(self, State, roundKey):
-        """ivan
+        """
         5.1.4 ADDROUNDKEY()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -202,7 +202,7 @@ class AES:
         return [self.SBox[w[0]], self.SBox[w[1]], self.SBox[w[2]], self.SBox[w[3]]]
 
     def KeyExpansion(self, key):
-        """ivan
+        """
         5.2 KEYEXPANSION()
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -228,7 +228,7 @@ class AES:
         return w
 
     def Cipher(self, State, Nr, Expanded_KEY):
-        """ivan
+        """
         5.1 Cipher(), Algorithm 1 p´ag. 12
         FIPS 197: Advanced Encryption Standard (AES)
         """
@@ -245,7 +245,7 @@ class AES:
         return State
 
     def InvCipher(self, State, Nr, Expanded_KEY):
-        """ivan
+        """
         5. InvCipher()
         Algorithm 3 p´ag. 20 o Algorithm 4 p´ag. 25. Son equivalentes
         FIPS 197: Advanced Encryption Standard (AES)
@@ -287,7 +287,7 @@ class AES:
         return b
 
     def encrypt_file(self, fichero):
-        """miguel
+        """
         Entrada: Nombre del fichero a cifrar
         Salida: Fichero cifrado usando la clave utilizada en el constructor
         de la clase.
@@ -329,7 +329,7 @@ class AES:
                 i += 16
 
     def decrypt_file(self, fichero):
-        """miguel
+        """
         Entrada: Nombre del fichero a descifrar
         Salida: Fichero descifrado usando la clave utilizada en el constructor
         de la clase.
@@ -342,7 +342,7 @@ class AES:
         with open(fichero, 'rb') as encrypted_file:
             encrypted_data = encrypted_file.read()
 
-        with open(fichero[0:len(fichero) - 4] + '.dec', 'wb') as unencrypted_file:
+        with open(fichero[0:len(fichero) - 4], 'wb') as unencrypted_file:
             IV = encrypted_data[0:16]
             i = 16
             first = True
@@ -361,8 +361,28 @@ class AES:
 
                 i += 16
 
+            unencrypted_file.seek(-1, 2)
+            last_byte = unencrypted_file.read(1)
+            nbytes_to_erase = int.from_bytes(last_byte, byteorder='big')
+            unencrypted_file.seek(-nbytes_to_erase, 1)
+            unencrypted_file.truncate()
 
-k = [0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c]
-a = AES(bytearray(k))
-a.encrypt_file('./ValoresTest/prueba.txt')
-a.decrypt_file('./ValoresTest/prueba.txt.enc')
+
+k = "2b7e151628aed2a6abf7158809cf4f3c"
+k = bytearray.fromhex(k)
+a = AES(k, 0x11b)
+# a.encrypt_file('./ValoresTest/prueba.txt')
+# a.decrypt_file('./ValoresTest/prueba.txt.enc')
+
+state = [
+    [0x32, 0x88, 0x31, 0xe0],
+    [0x43, 0x5a, 0x31, 0x37],
+    [0xf6, 0x30, 0x98, 0x7],
+    [0xa8, 0x8d, 0xa2, 0x34]
+]
+
+encState = a.Cipher(state, 10, a.Expanded_Key)
+a.printState(encState, "Cipher")
+# Deberían dar lo mismo si todas las funciones van bien
+decState = a.InvCipher(encState, 10, a.Expanded_Key)
+a.printState(decState, "InvCipher")
