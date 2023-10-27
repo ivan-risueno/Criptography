@@ -1,4 +1,6 @@
 from Lab2.G_F import G_F
+import os
+import secrets
 
 
 class AES:
@@ -31,7 +33,7 @@ class AES:
         """
         rounds_by_key_size = {16: 10, 24: 12, 32: 14}
         self.Polinomio_Irreducible = Polinomio_Irreducible
-        self.gf = G_F()
+        self.gf = G_F(Polinomio_Irreducible)
         self.Nr = rounds_by_key_size[len(key)]
         self.Nk = len(key) / 4
         self.SBox = (
@@ -71,7 +73,8 @@ class AES:
             0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
         )
         self.Rcon = self.initRcon()
-        # self.InvMixMatrix
+        self.Expanded_Key = self.KeyExpansion(key)
+        self.InvMixMatrix = [0x0e, 0x09, 0x0d, 0x0b]
 
     def SubBytes(self, State):
         """miguel
@@ -79,7 +82,9 @@ class AES:
         FIPS 197: Advanced Encryption Standard (AES)
         """
         for i in range(len(State)):
-            State[i] = self.SBox[State[i]]
+            for j in range(len(State)):
+                State[i][j] = self.SBox[State[i][j]]
+        return State
 
     def InvSubBytes(self, State):
         """miguel
@@ -87,7 +92,9 @@ class AES:
         FIPS 197: Advanced Encryption Standard (AES)
         """
         for i in range(len(State)):
-            State[i] = self.InvSBox[State[i]]
+            for j in range(len(State)):
+                State[i][j] = self.SBox[State[i][j]]
+        return State
 
     def ShiftRows(self, State):
         """ivan
@@ -120,52 +127,55 @@ class AES:
                 ret[i][0] = tmp
         return ret
 
-    def GaloisMulti(x, y):
-        p = 0
-        for c in range(8):
-            if b & 1:
-                p ^= a
-            a <<= 1
-            if a & 0x100:
-                a ^= 0x11b
-            b >>= 1
-        return p
-
     def MixColumns(self, State):
         """miguel
         5.1.3 MIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
-        nState = []
         for i in range(4):
-            col = self.state[c * 4:(c + 1) * 4]
-            nState.extend((
-                AES.GaloisMulti[0x02][col[0]] ^ AES.GaloisMulti[0x03][col[1]] ^ col[2] ^ col[3],
-                col[0] ^ AES.GaloisMulti[0x02][col[1]] ^ AES.GaloisMulti[0x03][col[2]] ^ col[3],
-                col[0] ^ col[1] ^ AES.GaloisMulti[0x02][col[2]] ^ AES.GaloisMulti[0x03][col[3]],
-                AES.GaloisMulti[0x03][col[0]] ^ col[1] ^ col[2] ^ AES.GaloisMulti[0x02][col[3]],
-            ))
-        self.State = nState
+            temp = [0, 0, 0, 0]
+            temp[0] ^= self.gf.producto(0x02, State[0][i]) ^ self.gf.producto(0x03, State[1][i]) ^ State[2][i] ^ \
+                       State[3][i]
+            temp[1] ^= State[0][i] ^ self.gf.producto(0x02, State[1][i]) ^ self.gf.producto(0x03, State[2][i]) ^ \
+                       State[3][i]
+            temp[2] ^= State[0][i] ^ State[1][i] ^ self.gf.producto(0x02, State[2][i]) ^ self.gf.producto(0x03,
+                                                                                                          State[3][i])
+            temp[3] ^= self.gf.producto(0x03, State[0][i]) ^ State[1][i] ^ State[2][i] ^ self.gf.producto(0x02,
+                                                                                                          State[3][i])
+            State[0][i] = temp[0]
+            State[1][i] = temp[1]
+            State[2][i] = temp[2]
+            State[3][i] = temp[3]
+        return State
 
     def InvMixColumns(self, State):
         """miguel
         5.3.3 INVMIXCOLUMNS()
         FIPS 197: Advanced Encryption Standard (AES)
         """
-        nState = []
         for i in range(4):
-            col = self.state[c * 4:(c + 1) * 4]
-            nState.extend((
-                AES.GaloisMulti[0x0E][col[0]] ^ AES.GaloisMulti[0x0B][col[1]] ^ AES.GaloisMulti[0x0D][col[2]] ^
-                AES.GaloisMulti[0x09][col[3]],
-                AES.GaloisMulti[0x09][col[0]] ^ AES.GaloisMulti[0x0E][col[1]] ^ AES.GaloisMulti[0x0B][col[2]] ^
-                AES.GaloisMulti[0x0D][col[3]],
-                AES.GaloisMulti[0x0D][col[0]] ^ AES.GaloisMulti[0x09][col[1]] ^ AES.GaloisMulti[0x0E][col[2]] ^
-                AES.GaloisMulti[0x0B][col[3]],
-                AES.GaloisMulti[0x0B][col[0]] ^ AES.GaloisMulti[0x0D][col[1]] ^ AES.GaloisMulti[0x09][col[2]] ^
-                AES.GaloisMulti[0x0E][col[3]],
-            ))
-        self.State = nState
+            temp = [0, 0, 0, 0]
+            temp[0] ^= (self.gf.producto(self.InvMixMatrix[0], State[0][i]) ^ self.gf.producto(self.InvMixMatrix[3],
+                                                                                               State[1][i])
+                        ^ self.gf.producto(self.InvMixMatrix[2], State[2][i]) ^ self.gf.producto(self.InvMixMatrix[1],
+                                                                                                 State[3][i]))
+            temp[1] ^= (self.gf.producto(self.InvMixMatrix[1], State[0][i]) ^ self.gf.producto(self.InvMixMatrix[0],
+                                                                                               State[1][i])
+                        ^ self.gf.producto(self.InvMixMatrix[3], State[2][i]) ^ self.gf.producto(self.InvMixMatrix[2],
+                                                                                                 State[3][i]))
+            temp[2] ^= (self.gf.producto(self.InvMixMatrix[2], State[0][i]) ^ self.gf.producto(self.InvMixMatrix[1],
+                                                                                               State[1][i])
+                        ^ self.gf.producto(self.InvMixMatrix[0], State[2][i]) ^ self.gf.producto(self.InvMixMatrix[3],
+                                                                                                 State[3][i]))
+            temp[3] ^= (self.gf.producto(self.InvMixMatrix[3], State[0][i]) ^ self.gf.producto(self.InvMixMatrix[2],
+                                                                                               State[1][i])
+                        ^ self.gf.producto(self.InvMixMatrix[1], State[2][i]) ^ self.gf.producto(self.InvMixMatrix[0],
+                                                                                                 State[3][i]))
+            State[0][i] = temp[0]
+            State[1][i] = temp[1]
+            State[2][i] = temp[2]
+            State[3][i] = temp[3]
+        return State
 
     def AddRoundKey(self, State, roundKey):
         """ivan
@@ -197,7 +207,6 @@ class AES:
         FIPS 197: Advanced Encryption Standard (AES)
         """
 
-        # key es un array con los valores de la llave, del estilo [0x12, 0x34, 0x56, 0x78, 0x90]
         w = [[0 for _ in range(4)] for _ in range(4 * (self.Nr + 1))]
         i = 0
         while i <= self.Nk - 1:
@@ -241,11 +250,11 @@ class AES:
         Algorithm 3 p´ag. 20 o Algorithm 4 p´ag. 25. Son equivalentes
         FIPS 197: Advanced Encryption Standard (AES)
         """
-        State = self.AddRoundKey(State, Expanded_KEY[4*Nr:4*Nr+4])
+        State = self.AddRoundKey(State, Expanded_KEY[4 * Nr:4 * Nr + 4])
         for round in range(Nr - 1, 1, -1):
             State = self.InvShiftRows(State)
             State = self.InvSubBytes(State)
-            State = self.AddRoundKey(State, Expanded_KEY[4*round:4*round+4])
+            State = self.AddRoundKey(State, Expanded_KEY[4 * round:4 * round + 4])
             State = self.InvMixColumns(State)
 
         State = self.InvShiftRows(State)
@@ -259,6 +268,24 @@ class AES:
             print(hex(State[i][0]) + " " + hex(State[i][1]) + " " + hex(State[i][2]) + " " + hex(State[i][3]))
         print()
 
+    def bytes_to_matrix(self, b):
+        block = [[0] * 4 for _ in range(4)]
+        for i in range(4):
+            for j in range(4):
+                byte_index = i * 4 + j
+                block[i][j] = b[byte_index]
+
+        return block
+
+    def matrix_to_bytes(self, m):
+        b = []
+        for i in range(4):
+            for j in range(4):
+                byte = m[i][j]
+                b.append(byte)
+        b = bytes(b)
+        return b
+
     def encrypt_file(self, fichero):
         """miguel
         Entrada: Nombre del fichero a cifrar
@@ -270,6 +297,36 @@ class AES:
         El nombre de fichero cifrado ser´a el obtenido al a~nadir el sufijo .enc
         al nombre del fichero a cifrar: NombreFichero --> NombreFichero.enc
         """
+        size = os.path.getsize(fichero)
+        with open(fichero, 'ab') as f_output:
+            if size % 16 == 0:
+                f_output.write(b'\x10' * 16)
+            else:
+                t = 16 - size % 16
+                f_output.write(bytes([t] * t))
+
+        IV = secrets.token_bytes(16)
+        with open(fichero, 'rb') as original_file:
+            original_content = original_file.read()
+
+        with open(fichero + '.enc', 'wb') as encrypted_file:
+            encrypted_file.write(IV)
+            first = True
+            i = 0
+            while i < len(original_content):
+                unencrypted_bytes = original_content[i:i + 16]
+
+                if first:
+                    first = False
+                    unencrypted_bytes = bytes(IV[i] ^ unencrypted_bytes[i] for i in range(16))
+
+                unencrypted_block = self.bytes_to_matrix(unencrypted_bytes)
+                encrypted_block = self.Cipher(unencrypted_block, self.Nr, self.Expanded_Key)
+                encrypted_bytes = self.matrix_to_bytes(encrypted_block)
+
+                encrypted_file.write(encrypted_bytes)
+
+                i += 16
 
     def decrypt_file(self, fichero):
         """miguel
@@ -282,28 +339,30 @@ class AES:
         El nombre de fichero descifrado ser´a el obtenido al a~nadir el sufijo .dec
         al nombre del fichero a descifrar: NombreFichero --> NombreFichero.dec
         """
+        with open(fichero, 'rb') as encrypted_file:
+            encrypted_data = encrypted_file.read()
+
+        with open(fichero[0:len(fichero) - 4] + '.dec', 'wb') as unencrypted_file:
+            IV = encrypted_data[0:16]
+            i = 16
+            first = True
+            while i < len(encrypted_data):
+                encrypted_bytes = encrypted_data[i:i + 16]
+
+                encrypted_block = self.bytes_to_matrix(encrypted_bytes)
+                unencrypted_block = self.InvCipher(encrypted_block, self.Nr, self.Expanded_Key)
+                unencrypted_bytes = self.matrix_to_bytes(unencrypted_block)
+
+                if first:
+                    first = False
+                    unencrypted_bytes = bytes(IV[i] ^ unencrypted_bytes[i] for i in range(16))
+
+                unencrypted_file.write(unencrypted_bytes)
+
+                i += 16
 
 
 k = [0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c]
-a = AES(k)
-key = a.KeyExpansion(k)
-input = [[0x32, 0x88, 0x31, 0xe0],
-         [0x43, 0x5a, 0x31, 0x37],
-         [0xf6, 0x30, 0x98, 0x07],
-         [0xa8, 0x8d, 0xa2, 0x34]]
-ret = a.AddRoundKey(input, key[0:4])
-a.printState(ret, "AddRoundKey")
-ret = [[0xd4, 0xe0, 0xb8, 0x1e],
-       [0x27, 0xbf, 0xb4, 0x41],
-       [0x11, 0x98, 0x5d, 0x52],
-       [0xae, 0xf1, 0xe5, 0x30]]
-a.printState(ret, "SubBytes")
-ret = a.ShiftRows(ret)
-a.printState(ret, "ShiftRows")
-ret = [[0x4, 0xe0, 0x48, 0x28],
-       [0x66, 0xcb, 0xf8, 0x6],
-       [0x81, 0x19, 0xd3, 0x26],
-       [0xe5, 0x9a, 0x7a, 0x4c]]
-a.printState(ret, "MixColumn")
-ret = a.AddRoundKey(ret, key[4 * 1:4 * 1 + 4])
-a.printState(ret, "AddRoundKey")
+a = AES(bytearray(k))
+a.encrypt_file('./ValoresTest/prueba.txt')
+a.decrypt_file('./ValoresTest/prueba.txt.enc')

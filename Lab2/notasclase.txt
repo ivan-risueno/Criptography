@@ -36,3 +36,17 @@ A continuacion se hace un XOR con los bytes de la key del bloque anterior. Por u
 una matriz que se llama RCON(la que toque).     Keyi[j] = Keyi-1[j] XOR Keyi[j-1].
 La RCON es un bloque muy largo de la longitud que toque, que está constituida por vectores columna. En las filas 2,3 y 4
 son 0s. En la primera fila hay 1,2,4,8,16... con la aritmetica del cuerpo finito(usamos el xTimes).
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+Preguntas para el profe para el día 25:
+
+- Para generar el IV aleatorio podemos usar la librería Crypto.random? si
+- Para usar CBC podemos utilizar Crypto.Cypher aunque usemos nuestra propia implementación del AES? NO
+- Para usar el padding podemos utilizar Crypto.Util.Padding? NO
+
+El orden del encrypt es el siguiente?
+    1. Añado 16 bytes(o los que toquen, PADDING) al archivo
+    2. Voy cogiendo 16 bytes(el IV será el primer bloque) y los voy encriptando hasta que intente
+    coger un bloque vacío
+    3. Para cada bloque de 16 bytes lo encripto y lo escribo en el archivo output
