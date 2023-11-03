@@ -76,9 +76,9 @@ class transaction:
         '''
         genera una transaccion firmando "message" con la clave "RSAkey"
         '''
-        self.public_key
-        self.message
-        self.signature
+        self.public_key = rsa_public_key(RSAkey)
+        self.message = message
+        self.signature = RSAkey.sign(message)
 
     def verify(self):
         '''
@@ -87,7 +87,7 @@ class transaction:
         p´ublica RSA;
         el booleano False en cualquier otro caso.
         '''
-
+        return self.public_key.verify(self.message, self.signature)
 
 class block:
     def __init__(self):
