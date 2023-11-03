@@ -1,26 +1,58 @@
+import math
+from Crypto import Random
+from Crypto.Util import number
+
+
 class rsa_key:
-    def __init__(self,bits_modulo=2048,e=2**16+1):
+    def __init__(self, bits_modulo=2048, e=2 ** 16 + 1):
         '''
         genera una clave RSA (de 2048 bits y exponente p´ublico 2**16+1 por defecto)
         '''
-        self.publicExponent
-        self.privateExponent
-        self.modulus
-        self.primeP
-        self.primeQ
-        self.privateExponentModulusPhiP
-        self.privateExponentModulusPhiQ
-        self.inverseQModulusP
+        self.publicExponent = e
+        self.bitsModulo = bits_modulo
+        self.generatePQ()
+        self.phiN = (self.primeP - 1) * (self.primeQ - 1)
+        self.privateExponent = number.inverse(self.publicExponent, self.phiN)
+        self.modulus = self.primeP * self.primeQ
+        self.privateExponentModulusPhiP = number.inverse(self.publicExponent, self.primeP)
+        self.privateExponentModulusPhiQ = number.inverse(self.publicExponent, self.primeQ)
+        self.inverseQModulusP = number.inverse(self.primeQ, self.primeP)
 
-    def sign(self,message):
+    def generatePQ(self):
+        found = False
+        while not found:
+            P = number.getPrime(int(self.bitsModulo / 2), randfunc=Random.get_random_bytes)
+            Q = number.getPrime(int(self.bitsModulo / 2), randfunc=Random.get_random_bytes)
+            found = self.checkIfPQAreCorrect(P, Q)
+
+        self.primeP = P
+        self.primeQ = Q
+
+    def checkIfPQAreCorrect(self, P, Q):
+        phiN = (P - 1) * (Q - 1)
+        return math.gcd(self.publicExponent, phiN) == 1 and P != Q
+
+    def sign(self, message):
         '''
         Salida: un entero que es la firma de "message" hecha con la clave RSA usando el TCR
         '''
+        dp = self.privateExponent % (self.primeP - 1)
+        dq = self.privateExponent % (self.primeQ - 1)
 
-    def sign_slow(self,message):
+        pq = number.inverse(self.primeP, self.primeQ)
+        qp = number.inverse(self.primeQ, self.primeP)
+
+        c1 = pow(message, dp, self.primeP)
+        c2 = pow(message, dq, self.primeQ)
+
+        return (c1 * qp * self.primeQ + c2 * pq * self.primeP) % self.modulus
+
+    def sign_slow(self, message):
         '''
         Salida: un entero que es la firma de "message" hecha con la clave RSA sin usar el TCR
         '''
+        return pow(message, self.privateExponent % ((self.primeP-1)*(self.primeQ-1)), self.modulus)
+
 
 class rsa_public_key:
     def __init__(self, rsa_key):
@@ -37,6 +69,7 @@ class rsa_public_key:
         p´ublica RSA;
         el booleano False en cualquier otro caso.
         '''
+
 
 class transaction:
     def __init__(self, message, RSAkey):
@@ -55,6 +88,7 @@ class transaction:
         el booleano False en cualquier otro caso.
         '''
 
+
 class block:
     def __init__(self):
         '''
@@ -65,7 +99,7 @@ class block:
         self.transaction
         self.seed
 
-    def genesis(self,transaction):
+    def genesis(self, transaction):
         '''
         genera el primer bloque de una cadena con la transacci´on "transaction"
         que se caracteriza por:
@@ -88,15 +122,16 @@ class block:
         el booleano False en cualquier otro caso.
         '''
 
+
 class block_chain:
-    def __init__(self,transaction):
+    def __init__(self, transaction):
         '''
         genera una cadena de bloques que es una lista de bloques,
         el primer bloque es un bloque "genesis" generado amb la transacci´o "transaction"
         '''
         self.list_of_blocks
 
-    def add_block(self,transaction):
+    def add_block(self, transaction):
         '''
         a~nade a la cadena un nuevo bloque v´alido generado con la transacci´on "transaction"
         '''
