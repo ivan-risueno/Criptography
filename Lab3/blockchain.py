@@ -59,8 +59,8 @@ class rsa_public_key:
         '''
         genera la clave p´ublica RSA asociada a la clave RSA "rsa_key"
         '''
-        self.publicExponent
-        self.modulus
+        self.publicExponent = rsa_key.publicExponent
+        self.modulus = rsa_key.modulus
 
     def verify(self, message, signature):
         '''
@@ -69,7 +69,7 @@ class rsa_public_key:
         p´ublica RSA;
         el booleano False en cualquier otro caso.
         '''
-
+        return pow(signature, self.publicExponent, self.modulus) == message
 
 class transaction:
     def __init__(self, message, RSAkey):
