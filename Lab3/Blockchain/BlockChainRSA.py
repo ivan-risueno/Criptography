@@ -105,7 +105,8 @@ class block:
         self.transaction = 0
         self.seed = 0
 
-    def generate_hash(self):
+    def generate_hash(self, correct_hash=False):
+        # Por defecto es conveniente llamar a esta función sin ningún parámetro
         while True:
             seed = random.randint(0, 2 ** 256)
             entrada = str(self.previous_block_hash)
@@ -115,7 +116,7 @@ class block:
             entrada = entrada + str(self.transaction.signature)
             entrada = entrada + str(seed)
             h = int(hashlib.sha256(entrada.encode()).hexdigest(), 16)
-            if h < pow(2, 256 - 16):
+            if not correct_hash or h < pow(2, 256 - 16):  # Por defecto se busca un hash válido
                 self.block_hash = h
                 self.seed = seed
                 break
@@ -129,7 +130,7 @@ class block:
         """
         self.previous_block_hash = 0
         self.transaction = transaction
-        self.generate_hash()
+        self.generate_hash()  # Generamos un hash válido
 
     def next_block(self, transaction):
         """
@@ -138,7 +139,7 @@ class block:
         b = block()
         b.transaction = transaction
         b.previous_block_hash = self.block_hash
-        b.generate_hash()
+        b.generate_hash()  # Generamos un hash válido
         return b
 
     def verify_block(self):
