@@ -73,7 +73,7 @@ class rsa_public_key:
         p´ublica RSA;
         el booleano False en cualquier otro caso.
         """
-        return pow(signature, self.publicExponent) == message % self.modulus
+        return pow(signature, self.publicExponent, self.modulus) == message
 
 
 class transaction:
