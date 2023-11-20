@@ -117,6 +117,7 @@ class block:
             h = int(hashlib.sha256(entrada.encode()).hexdigest(), 16)
             if h < pow(2, 256 - 16):
                 self.block_hash = h
+                self.seed = seed
                 break
 
     def genesis(self, transaction):
