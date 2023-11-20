@@ -106,8 +106,8 @@ class block:
         self.seed = 0
 
     def generate_hash(self):
-        seed = random.randint(0, 2 ** 256)
         while True:
+            seed = random.randint(0, 2 ** 256)
             entrada = str(self.previous_block_hash)
             entrada = entrada + str(self.transaction.public_key.publicExponent)
             entrada = entrada + str(self.transaction.public_key.modulus)
