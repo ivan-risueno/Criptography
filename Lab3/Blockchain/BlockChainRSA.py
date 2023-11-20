@@ -151,8 +151,7 @@ class block:
         Salida: el booleano True si todas las comprobaciones son correctas;
         el booleano False en cualquier otro caso.
         """
-        # No hace falta verificar que el hash cumple la condición porque ya lo hace cuando se genera
-        return self.transaction.verify()
+        return self.transaction.verify() and self.block_hash < 2 ** (256-16) and self.previous_block_hash < 2 ** (256-16)
 
 
 class block_chain:
