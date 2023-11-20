@@ -105,7 +105,7 @@ class block:
         self.transaction = 0
         self.seed = 0
 
-    def generate_hash(self, correct_hash=False):
+    def generate_hash(self, correct_hash=True):
         # Por defecto es conveniente llamar a esta función sin ningún parámetro
         while True:
             seed = random.randint(0, 2 ** 256)
@@ -151,7 +151,10 @@ class block:
         Salida: el booleano True si todas las comprobaciones son correctas;
         el booleano False en cualquier otro caso.
         """
-        return self.transaction.verify() and self.block_hash < 2 ** (256-16) and self.previous_block_hash < 2 ** (256-16)
+        a = self.transaction.verify()
+        b = self.block_hash < pow(2, 256 - 16)
+        c = self.previous_block_hash < pow(2, 256 - 16)
+        return a and b and c
 
 
 class block_chain:
