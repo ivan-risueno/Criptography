@@ -54,7 +54,7 @@ for i in range(0, len(STUDENTS)):
     mod = n
     e = 65537
 
-    # Calculate the private exponent(d) in: https://www.tausquared.net/pages/ctf/rsa.html
+    # Calculate the private exponent(d) at: https://www.tausquared.net/pages/ctf/rsa.html
     d = int(input("Enter the private exponent(d) obtained in base 10: "))
     print("Validating RSA mathematical restrictions...")
     p = int(p)
