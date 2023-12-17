@@ -8,9 +8,9 @@ def execute():
     # Both can be obtained via saving the certificate bytes as raw bytes(we've picked the first two certificates shown
     # in the lsit)
 
-    # os.system("openssl x509 -inform DER -in certificadoFIB.cer -out certificadoFIB.pem")
-    # os.system("openssl ocsp -issuer certificado_GEANT_OV_RSA_CA.pem -cert certificadoFIB.pem "
-    #           "-url http://GEANT.ocsp.sectigo.com -text > verificacion.txt")
+    os.system("openssl x509 -inform DER -in certificadoFIB.cer -out certificadoFIB.pem")
+    os.system("openssl ocsp -issuer certificado_GEANT_OV_RSA_CA.pem -cert certificadoFIB.pem "
+              "-url http://GEANT.ocsp.sectigo.com -text > verificacion.txt")
 
     # After that, we open the file and obtain the information
     verification = open("verificacion.txt", "r")
