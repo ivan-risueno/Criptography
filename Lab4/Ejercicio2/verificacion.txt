@@ -1,0 +1,61 @@
+OCSP Request Data:
+    Version: 1 (0x0)
+    Requestor List:
+        Certificate ID:
+          Hash Algorithm: sha1
+          Issuer Name Hash: C3FDEA1EAA0EBEDE75016EEC6E5BB393F0F12E5D
+          Issuer Key Hash: 6F1D3549106C32FA59A09EBC8AE81F95BE717A0C
+          Serial Number: D534CB7A0BF5F45FCDF904FBA6541D86
+    Request Extensions:
+        OCSP Nonce: 
+            0410B984894CE2BB0E2C009C96D734F894F9
+OCSP Response Data:
+    OCSP Response Status: successful (0x0)
+    Response Type: Basic OCSP Response
+    Version: 1 (0x0)
+    Responder Id: 6F1D3549106C32FA59A09EBC8AE81F95BE717A0C
+    Produced At: Dec 13 18:34:37 2023 GMT
+    Responses:
+    Certificate ID:
+      Hash Algorithm: sha1
+      Issuer Name Hash: C3FDEA1EAA0EBEDE75016EEC6E5BB393F0F12E5D
+      Issuer Key Hash: 6F1D3549106C32FA59A09EBC8AE81F95BE717A0C
+      Serial Number: D534CB7A0BF5F45FCDF904FBA6541D86
+    Cert Status: good
+    This Update: Dec 13 18:34:37 2023 GMT
+    Next Update: Dec 20 18:34:36 2023 GMT
+
+    Signature Algorithm: sha384WithRSAEncryption
+    Signature Value:
+        a1:7f:40:6c:8e:d3:ab:c4:dc:03:27:1b:6e:74:ae:3c:50:24:
+        0c:a5:b8:7f:5d:ec:14:5f:c2:f3:a6:09:b1:1a:95:7a:c6:3c:
+        a8:3e:9f:10:c7:8c:59:25:9e:c0:b7:3c:d1:97:3c:68:fd:f3:
+        80:7c:e9:ea:52:55:10:29:ff:1f:a4:94:5a:0e:63:63:48:59:
+        0a:f9:8f:69:a6:5a:9c:35:c3:8e:d8:72:53:71:79:a0:01:e3:
+        09:fa:27:fe:08:de:c2:f8:a0:4c:28:ca:fd:8a:b8:11:9d:a7:
+        90:df:1a:b9:bc:b5:5b:3a:02:85:ed:44:9c:a7:41:26:41:5d:
+        be:dc:69:bf:aa:0f:a8:ac:ca:df:23:de:0d:92:15:de:fa:08:
+        f7:bb:97:e6:97:da:bd:61:b0:a5:70:f6:49:61:e1:af:38:24:
+        aa:b1:90:fa:85:ad:f9:aa:bc:99:2e:fd:c8:86:a9:1f:f2:9f:
+        0a:37:c1:38:04:b9:c0:f0:95:76:e2:5f:a4:ea:43:bf:44:e1:
+        ed:44:d6:a9:cf:48:31:8a:21:cf:7b:5f:2e:70:7c:95:de:31:
+        4d:2a:76:90:90:8c:9c:1c:37:2c:5b:85:56:60:f2:2e:30:85:
+        e4:46:59:08:f4:ce:fd:fe:b8:95:d9:27:fa:b0:97:e9:9c:f4:
+        97:7c:91:02:9c:fc:ab:99:93:52:ee:04:25:3a:7c:a0:6f:5b:
+        02:2e:32:e2:d9:1e:5e:3c:ed:56:6f:ac:aa:8f:ed:19:96:44:
+        43:85:df:28:8e:bc:e0:9d:59:6e:d5:11:55:d5:bc:f1:86:90:
+        61:d7:f1:84:88:98:92:be:2a:63:fb:32:7a:25:e7:1e:bb:3b:
+        1d:3a:11:71:95:79:aa:1a:99:fd:9f:78:94:a4:1c:b7:da:2d:
+        61:53:bf:fc:d1:e2:3d:6c:be:ee:11:2a:7f:29:fa:2d:f4:36:
+        7e:4f:1d:d0:c8:70:89:8d:83:21:c3:8c:16:9b:04:42:ae:f6:
+        f5:99:b4:78:bc:bb:e1:04:06:b9:ee:00:92:0c:df:e6:41:9f:
+        0e:00:72:68:b0:0f:1b:29:7a:86:34:71:11:e2:8e:81:0b:48:
+        92:37:ff:eb:cc:00:0e:6a:51:74:e9:90:b3:41:7c:4c:58:31:
+        15:77:04:74:8f:a9:35:4e:ff:a9:b6:6d:cc:80:f2:fa:0f:16:
+        4a:6e:6d:fe:f8:3d:56:d7:95:35:9e:a8:23:d8:80:ba:a2:22:
+        64:69:a0:f6:cb:de:8f:73:ef:e6:ae:11:1c:ad:bc:38:7b:f2:
+        82:e3:78:85:c6:a8:e1:5f:90:10:36:c4:1c:51:6b:36:6f:ea:
+        56:ed:f5:1a:ea:6e:21:c7
+certificadoFIB.pem: good
+	This Update: Dec 13 18:34:37 2023 GMT
+	Next Update: Dec 20 18:34:36 2023 GMT
