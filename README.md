@@ -1,1 +1,1 @@
-Laboratory exercises for the Criptography suubject @ FIB (2023-2024Q1).
+Laboratory exercises for the Criptography subject @ FIB (2023-2024Q1).
